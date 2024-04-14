@@ -1,10 +1,11 @@
 import { Account, Ed25519PrivateKey, Aptos, AptosConfig, Network, NetworkToNetworkName } from "@aptos-labs/ts-sdk";
 const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK || ""] || Network.DEVNET;
+const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || process.exit(1);
 const config = new AptosConfig({ network: APTOS_NETWORK });
 const aptos = new Aptos(config);
 
 const receiver = Account.fromPrivateKey({
-    privateKey: new Ed25519PrivateKey("0x030bce595098949b64bd17f4812b03e4a28d1bf14ea290cbff6a28f7f7379a46"),
+    privateKey: new Ed25519PrivateKey(PRIVATE_KEY),
 });
 
 const ipfs_cid = "Qmcjuxa9ccH9oriJNmywBX3AmxeZq9KC55gG9mpiWQXivf";
@@ -17,7 +18,7 @@ async function main() {
         sender: receiver.accountAddress,
         data: {
             function: `${receiver.accountAddress}::contract::publish_book`,
-            typeArguments: [`std::string::String`, `std::string::String`],
+            // typeArguments: [`std::string::String`, `std::string::String`],
             functionArguments: [ipfs_cid, encryption_pub_key],
         },
     });

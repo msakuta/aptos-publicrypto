@@ -5,7 +5,7 @@ module publicrypto::contract {
     use std::string::String;
 
     /// Address of the owner of this module
-    // const MODULE_OWNER: address = @publicrypto;
+    const MODULE_OWNER: address = @publicrypto;
 
     /// Error codes
     const ENOT_MODULE_OWNER: u64 = 0;
@@ -22,6 +22,12 @@ module publicrypto::contract {
         books: vector<Book>,
     }
 
+    fun init_module(sender: &signer) {
+        move_to(sender, Bookshelf {
+            books: vector[],
+        });
+    }
+
     /// Publish an empty balance resource under `account`'s address. This function must be called before
     /// minting or transferring to the account.
     public entry fun publish_book(account: &signer, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
@@ -36,5 +42,22 @@ module publicrypto::contract {
         } else {
             move_to(account, Bookshelf { books: vector[book] });
         }
+    }
+
+    #[view]
+    public fun get_bookshelf(): vector<String> acquires Bookshelf {
+        let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
+        let ret = vector[];
+        for (i in 0..vector::length(&bookshelf.books)) {
+            let book = vector::borrow(&bookshelf.books, i);
+            vector::push_back(&mut ret, book.ipfs_cid);
+        };
+        ret
+    }
+
+    #[view]
+    public fun num_books(): u64 acquires Bookshelf {
+        let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
+        vector::length(&bookshelf.books)
     }
 }
