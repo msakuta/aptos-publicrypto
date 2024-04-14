@@ -1,0 +1,13 @@
+[package]
+name = "publicrypto"
+version = "0.1.0"
+authors = []
+
+[addresses]
+publicrypto = "00c3d2a68d7a9d425ce63d3b08194a01ee8a0d12e39e711cfbef3c9fbff01264"
+
+[dependencies.AptosStdlib]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = 'main'
+subdir = 'aptos-move/framework/aptos-stdlib'
+

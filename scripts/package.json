@@ -1,0 +1,16 @@
+{
+  "name": "publicrypto-scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "add_book": "ts-node add_book.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.12.2",
+    "typescript": "^5.4.5"
+  }
+}
