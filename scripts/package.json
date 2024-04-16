@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "add_book": "ts-node add_book.ts",
+    "add_book": "tsx add_book.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@aptos-labs/ts-sdk": "^1.12.2",
+    "@helia/unixfs": "^3.0.3",
+    "helia": "^4.1.0",
     "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.2"
   }
 }
