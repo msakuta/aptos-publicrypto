@@ -52,3 +52,13 @@ The first argument is the file name of the encrypted document, and the second is
 The encrypted file is uploaded to IPFS and its CID is published to the smart contract along with the encryption public key.
 
 Note that the book is added to the shelf, so you can put multiple books in an account.
+
+
+## Retrieve encrypted contents from IPFS `get_book.ts`
+
+This script takes an argument, the IPFS CID, to obtain the file.
+The file has to be pinned beforehand.
+
+    npx tsx get_book.ts <CID>
+
+and the output is written to `output.enc`.

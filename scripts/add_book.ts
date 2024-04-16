@@ -26,8 +26,6 @@ const encryptionPubKeyName = process.argv[3] || (() => {
 
 console.log(`Reading ${fileName}`);
 
-// const encryption_pub_key = "QmQfpjgaGKTz1vqz7Dgzvp3gmodgfnjiZ9CM8kNZ2QAXwb";
-
 console.log(`fun: ${receiver.accountAddress}::contract::publish_book`);
 
 function readFile(fname: string) {
@@ -55,7 +53,7 @@ async function main() {
 
     // create an empty dir and a file, then add the file to the dir
     const emptyDirCid = await fs.addDirectory()
-    const fileCid = await fs.addBytes(new Uint8Array(fileContents))
+    const fileCid = await fs.addBytes(new Uint8Array(fileContents));
     const updateDirCid = await fs.cp(fileCid, emptyDirCid, 'foo.txt')
     // const ipfs_cid = "Qmcjuxa9ccH9oriJNmywBX3AmxeZq9KC55gG9mpiWQXivf";
 
