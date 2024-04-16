@@ -30,7 +30,7 @@ console.log(`Reading ${fileName}`);
 
 console.log(`fun: ${receiver.accountAddress}::contract::publish_book`);
 
-function readFile(fname) {
+function readFile(fname: string) {
     return (async () => {
         const file = await fsPromises.open(fname);
         const ret = await file.readFile();
