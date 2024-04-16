@@ -1,6 +1,6 @@
 # Aptos-publicrypto
 
-<div style="text-align: center"><img src="images/book-on-chain.png"></div>
+<div align="center"><img src="images/book-on-chain.png" alt="Book on chain icon"></div>
 
 A development repository for publicrypto book publishing platform using Aptos blockchain
 and IPFS distributed filesystem.
