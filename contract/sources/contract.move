@@ -17,7 +17,7 @@ module publicrypto::contract {
         encryption_pub_key: String,
     }
 
-    /// Struct representing the balance of each address.
+    /// A collection of books owned by this account.
     struct Bookshelf has key {
         books: vector<Book>,
     }
@@ -28,8 +28,6 @@ module publicrypto::contract {
         });
     }
 
-    /// Publish an empty balance resource under `account`'s address. This function must be called before
-    /// minting or transferring to the account.
     public entry fun publish_book(account: &signer, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
         let book = Book {
             ipfs_cid,
