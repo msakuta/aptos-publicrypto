@@ -12,6 +12,8 @@ module publicrypto::contract {
     const ENOT_MODULE_OWNER: u64 = 0;
     const EINSUFFICIENT_BALANCE: u64 = 1;
     const EALREADY_HAS_BOOK: u64 = 2;
+    const ENOT_INITIALIZED: u64 = 3;
+    const ENO_BOOK: u64 = 4;
 
     struct Book has store {
         name: String,
@@ -52,22 +54,20 @@ module publicrypto::contract {
         }
     }
 
-    public entry fun request_book(sender: &signer, _receiver: &signer, name: String) acquires Bookshelf {
+    public entry fun request_book(sender: &signer, receiver: address, name: String) acquires Bookshelf {
         let sender_addr = signer::address_of(sender);
-        if (exists<Bookshelf>(sender_addr)) {
-            let bookshelf = borrow_global_mut<Bookshelf>(sender_addr);
-            let has_book = false;
-            for (i in 0..vector::length(&bookshelf.books)) {
-                let book = vector::borrow(&bookshelf.books, i);
-                if (book.name == name) {
-                    has_book = true;
-                    break
-                }
-            };
-            if (has_book) {
-
+        assert!(exists<Bookshelf>(sender_addr), ENOT_INITIALIZED);
+        let bookshelf = borrow_global_mut<Bookshelf>(sender_addr);
+        let has_book = false;
+        for (i in 0..vector::length(&bookshelf.books)) {
+            let book = vector::borrow_mut(&mut bookshelf.books, i);
+            if (book.name == name) {
+                has_book = true;
+                book.requester = some(receiver);
+                break
             }
-        }
+        };
+        assert!(has_book, ENO_BOOK);
     }
 
     public entry fun publish_book(account: &signer, name: String, price: u64, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
