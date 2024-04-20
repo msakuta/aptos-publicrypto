@@ -27,6 +27,14 @@ This is the most basic script to scaffold testing environment.
 Using Aptos SDK, it generates a new account and prints its address.
 
 
+## Generate public/private RSA key pairs `gen_rsa.sh`
+
+After running `gen_rsa.sh`, you will have following files.
+
+* private.pem
+* public.pem
+
+
 ## Generating an encrypted version of a document `make_encrypted.bash`
 
 This script takes single argument like below:
