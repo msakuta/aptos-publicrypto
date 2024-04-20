@@ -15,12 +15,17 @@ module publicrypto::contract {
     const ENOT_INITIALIZED: u64 = 3;
     const ENO_BOOK: u64 = 4;
 
+    struct Requester has store, copy, drop {
+        addr: address,
+        encryption_pub_key: String,
+    }
+
     struct Book has store {
         name: String,
         price: u64,
         ipfs_cid: String,
         encryption_pub_key: String,
-        requester: Option<address>,
+        requester: Option<Requester>,
     }
 
     /// A collection of books owned by this account.
@@ -54,7 +59,7 @@ module publicrypto::contract {
         }
     }
 
-    public entry fun request_book(sender: &signer, receiver: address, name: String) acquires Bookshelf {
+    public entry fun request_book(sender: &signer, receiver: address, name: String, encryption_pub_key: String) acquires Bookshelf {
         let sender_addr = signer::address_of(sender);
         assert!(exists<Bookshelf>(sender_addr), ENOT_INITIALIZED);
         let bookshelf = borrow_global_mut<Bookshelf>(sender_addr);
@@ -63,7 +68,10 @@ module publicrypto::contract {
             let book = vector::borrow_mut(&mut bookshelf.books, i);
             if (book.name == name) {
                 has_book = true;
-                book.requester = some(receiver);
+                book.requester = some(Requester {
+                    addr: receiver,
+                    encryption_pub_key,
+                });
                 break
             }
         };
