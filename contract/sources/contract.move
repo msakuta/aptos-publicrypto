@@ -3,7 +3,7 @@ module publicrypto::contract {
     use std::signer;
     use std::vector;
     use std::string::String;
-    use std::option::{some, none, Option, is_some};
+    use std::option::{some, none, Option, is_none};
 
     /// Address of the owner of this module
     const MODULE_OWNER: address = @publicrypto;
@@ -11,13 +11,14 @@ module publicrypto::contract {
     /// Error codes
     const ENOT_MODULE_OWNER: u64 = 0;
     const EINSUFFICIENT_BALANCE: u64 = 1;
-    const EALREADY_HAS_BALANCE: u64 = 2;
+    const EALREADY_HAS_BOOK: u64 = 2;
 
     struct Book has store {
         name: String,
         price: u64,
         ipfs_cid: String,
         encryption_pub_key: String,
+        requester: Option<address>,
     }
 
     /// A collection of books owned by this account.
@@ -71,14 +72,13 @@ module publicrypto::contract {
 
     public entry fun publish_book(account: &signer, name: String, price: u64, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
         let addr = signer::address_of(account);
-        if (is_some(&find_book_int(addr, name))) {
-            return
-        };
+        assert!(is_none(&find_book_int(addr, name)), EALREADY_HAS_BOOK);
         let book = Book {
             name,
             price,
             ipfs_cid,
             encryption_pub_key,
+            requester: none(),
         };
         if (exists<Bookshelf>(addr)) {
             let bookshelf = borrow_global_mut<Bookshelf>(addr);
