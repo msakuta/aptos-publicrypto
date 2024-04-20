@@ -3,7 +3,7 @@ module publicrypto::contract {
     use std::signer;
     use std::vector;
     use std::string::String;
-    use std::option::{some, none, Option, is_none};
+    use std::option::{Self, some, none, Option, is_none};
 
     /// Address of the owner of this module
     const MODULE_OWNER: address = @publicrypto;
@@ -18,6 +18,8 @@ module publicrypto::contract {
     struct Requester has store, copy, drop {
         addr: address,
         encryption_pub_key: String,
+        reencrypted_cid: Option<String>,
+        encrypted_passwd: Option<String>,
     }
 
     struct Book has store {
@@ -41,16 +43,22 @@ module publicrypto::contract {
 
     #[view]
     public fun find_book(name: String): Option<String> acquires Bookshelf {
-        find_book_int(MODULE_OWNER, name)
+        let i = find_book_int(MODULE_OWNER, name);
+        if (is_none(&i)) {
+            return none()
+        };
+        let idx = option::extract(&mut i);
+        let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
+        some(vector::borrow(&bookshelf.books, idx).ipfs_cid)
     }
 
-    fun find_book_int(addr: address, name: String): Option<String> acquires Bookshelf {
+    fun find_book_int(addr: address, name: String): Option<u64> acquires Bookshelf {
         if (exists<Bookshelf>(addr)) {
-            let bookshelf = borrow_global_mut<Bookshelf>(MODULE_OWNER);
+            let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
             for (i in 0..vector::length(&bookshelf.books)) {
                 let book = vector::borrow(&bookshelf.books, i);
                 if (book.name == name) {
-                    return some(book.ipfs_cid)
+                    return some(i)
                 }
             };
             none()
@@ -71,6 +79,8 @@ module publicrypto::contract {
                 book.requester = some(Requester {
                     addr: receiver,
                     encryption_pub_key,
+                    reencrypted_cid: none(),
+                    encrypted_passwd: none(),
                 });
                 break
             }
@@ -94,6 +104,18 @@ module publicrypto::contract {
         } else {
             move_to(account, Bookshelf { books: vector[book] });
         }
+    }
+
+    public entry fun reencrypt_book(account: &signer, name: String, encrypted_cid: String, encrypted_passwd: String) acquires Bookshelf {
+        let addr = signer::address_of(account);
+        let book_i = find_book_int(addr, name);
+        assert!(option::is_some(&book_i), ENO_BOOK);
+        let bookshelf = borrow_global_mut<Bookshelf>(addr);
+        let book = vector::borrow_mut(&mut bookshelf.books, option::extract(&mut book_i));
+        assert!(option::is_some(&book.requester), ENO_BOOK);
+        let requester = option::borrow_mut(&mut book.requester);
+        requester.reencrypted_cid = some(encrypted_cid);
+        requester.encrypted_passwd = some(encrypted_passwd);
     }
 
     #[view]
