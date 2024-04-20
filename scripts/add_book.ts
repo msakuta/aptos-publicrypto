@@ -4,7 +4,10 @@ import { unixfs } from '@helia/unixfs';
 import { promises as fsPromises } from 'node:fs';
 
 const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK || ""] || Network.DEVNET;
-const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || process.exit(1);
+const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || (() => {
+    console.log("Please specify APTOS_PRIVATE_KEY env var to specify the account private key.");
+    process.exit(1);
+});
 const config = new AptosConfig({ network: APTOS_NETWORK });
 const aptos = new Aptos(config);
 
@@ -13,13 +16,19 @@ const receiver = Account.fromPrivateKey({
 });
 
 const fileName = process.argv[2] || (() => {
-    console.log(`usage: add_book.ts <fileName> <encryptionPubKey>`);
+    console.log(`usage: add_book.ts <fileName> <price in uaptos> <encryptionPubKey>`);
     console.log("Please specify the file name of the book to add");
     process.exit(124);
 })();
 
-const encryptionPubKeyName = process.argv[3] || (() => {
-    console.log(`usage: add_book.ts <fileName> <encryptionPubKey>`);
+const price = parseInt(process.argv[3]) || (() => {
+    console.log(`usage: add_book.ts <fileName> <price in uaptos> <encryptionPubKey>`);
+    console.log("Please specify the price in integer");
+    process.exit(125);
+})();
+
+const encryptionPubKeyName = process.argv[4] || (() => {
+    console.log(`usage: add_book.ts <fileName> <price in uaptos> <encryptionPubKey>`);
     console.log("Please specify the encryption public key");
     process.exit(125);
 })();
@@ -64,7 +73,7 @@ async function main() {
         data: {
             function: `${receiver.accountAddress}::contract::publish_book`,
             // typeArguments: [`std::string::String`, `std::string::String`],
-            functionArguments: [fileCid.toString(), encryptionPubKey.toString()],
+            functionArguments: [fileName, price, fileCid.toString(), encryptionPubKey.toString()],
         },
     });
 

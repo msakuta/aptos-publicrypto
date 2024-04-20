@@ -3,6 +3,7 @@ module publicrypto::contract {
     use std::signer;
     use std::vector;
     use std::string::String;
+    use std::option::{some, none, Option};
 
     /// Address of the owner of this module
     const MODULE_OWNER: address = @publicrypto;
@@ -13,6 +14,8 @@ module publicrypto::contract {
     const EALREADY_HAS_BALANCE: u64 = 2;
 
     struct Book has store {
+        name: String,
+        price: u64,
         ipfs_cid: String,
         encryption_pub_key: String,
     }
@@ -28,8 +31,45 @@ module publicrypto::contract {
         });
     }
 
-    public entry fun publish_book(account: &signer, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
+    #[view]
+    public fun find_book(account: &signer, name: String): Option<String> acquires Bookshelf {
+        let addr = signer::address_of(account);
+        if (exists<Bookshelf>(addr)) {
+            let bookshelf = borrow_global_mut<Bookshelf>(addr);
+            for (i in 0..vector::length(&bookshelf.books)) {
+                let book = vector::borrow(&bookshelf.books, i);
+                if (book.name == name) {
+                    return some(book.ipfs_cid)
+                }
+            };
+            none()
+        } else {
+            none()
+        }
+    }
+
+    public entry fun request_book(sender: &signer, _receiver: &signer, name: String) acquires Bookshelf {
+        let sender_addr = signer::address_of(sender);
+        if (exists<Bookshelf>(sender_addr)) {
+            let bookshelf = borrow_global_mut<Bookshelf>(sender_addr);
+            let has_book = false;
+            for (i in 0..vector::length(&bookshelf.books)) {
+                let book = vector::borrow(&bookshelf.books, i);
+                if (book.name == name) {
+                    has_book = true;
+                    break
+                }
+            };
+            if (has_book) {
+
+            }
+        }
+    }
+
+    public entry fun publish_book(account: &signer, name: String, price: u64, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
         let book = Book {
+            name,
+            price,
             ipfs_cid,
             encryption_pub_key,
         };
