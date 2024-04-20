@@ -7,7 +7,10 @@ import { Account, Ed25519PrivateKey, Aptos, AptosConfig, Network, NetworkToNetwo
 import { promises as fsPromises } from 'node:fs';
 
 const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK || ""] || Network.DEVNET;
-const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || process.exit(1);
+const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || (() => {
+    console.log("Please specify APTOS_PRIVATE_KEY env var to specify the account private key.");
+    process.exit(1);
+})();
 const config = new AptosConfig({ network: APTOS_NETWORK });
 const aptos = new Aptos(config);
 

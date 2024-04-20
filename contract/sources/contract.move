@@ -52,6 +52,36 @@ module publicrypto::contract {
         some(vector::borrow(&bookshelf.books, idx).ipfs_cid)
     }
 
+    #[view]
+    public fun get_book_reencrypted_cid(name: String): Option<String> acquires Bookshelf {
+        let i = find_book_int(MODULE_OWNER, name);
+        if (is_none(&i)) {
+            return none()
+        };
+        let idx = option::extract(&mut i);
+        let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
+        let book = vector::borrow(&bookshelf.books, idx);
+        if (is_none(&book.requester)) {
+            return none()
+        };
+        option::borrow(&book.requester).reencrypted_cid
+    }
+
+    #[view]
+    public fun get_book_encrypted_password(name: String): Option<String> acquires Bookshelf {
+        let i = find_book_int(MODULE_OWNER, name);
+        if (is_none(&i)) {
+            return none()
+        };
+        let idx = option::extract(&mut i);
+        let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);
+        let book = vector::borrow(&bookshelf.books, idx);
+        if (is_none(&book.requester)) {
+            return none()
+        };
+        option::borrow(&book.requester).encrypted_passwd
+    }
+
     fun find_book_int(addr: address, name: String): Option<u64> acquires Bookshelf {
         if (exists<Bookshelf>(addr)) {
             let bookshelf = borrow_global<Bookshelf>(MODULE_OWNER);

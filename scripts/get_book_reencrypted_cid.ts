@@ -11,7 +11,7 @@ interface FindBookResult {
 async function main() {
     const view: FindBookResult[] = await aptos.view({
         payload: {
-            function: `${receiverAddress}::contract::find_book`,
+            function: `${receiverAddress}::contract::get_book_reencrypted_cid`,
             functionArguments: [fileName],
         },
     });
