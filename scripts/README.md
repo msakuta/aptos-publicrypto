@@ -70,3 +70,10 @@ The file has to be pinned beforehand.
     npx tsx get_book.ts <CID>
 
 and the output is written to `output.enc`.
+
+## Find book by name `find_book.ts`
+
+You may not want to memorize CID and query by it.
+You can use file name instead.
+
+    npx tsx find_book.ts <fileName>

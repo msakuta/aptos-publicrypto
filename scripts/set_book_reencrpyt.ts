@@ -68,7 +68,7 @@ async function main() {
         data: {
             function: fun,
             // typeArguments: [`std::string::String`, `std::string::String`],
-            functionArguments: [fileName, fileCid.toString(), encryptedPasswd],
+            functionArguments: [fileName, fileCid.toString(), encryptedPasswd.toString()],
         },
     });
 
