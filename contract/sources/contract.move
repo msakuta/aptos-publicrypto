@@ -3,7 +3,7 @@ module publicrypto::contract {
     use std::signer;
     use std::vector;
     use std::string::String;
-    use std::option::{some, none, Option};
+    use std::option::{some, none, Option, is_some};
 
     /// Address of the owner of this module
     const MODULE_OWNER: address = @publicrypto;
@@ -32,10 +32,13 @@ module publicrypto::contract {
     }
 
     #[view]
-    public fun find_book(account: &signer, name: String): Option<String> acquires Bookshelf {
-        let addr = signer::address_of(account);
+    public fun find_book(name: String): Option<String> acquires Bookshelf {
+        find_book_int(MODULE_OWNER, name)
+    }
+
+    fun find_book_int(addr: address, name: String): Option<String> acquires Bookshelf {
         if (exists<Bookshelf>(addr)) {
-            let bookshelf = borrow_global_mut<Bookshelf>(addr);
+            let bookshelf = borrow_global_mut<Bookshelf>(MODULE_OWNER);
             for (i in 0..vector::length(&bookshelf.books)) {
                 let book = vector::borrow(&bookshelf.books, i);
                 if (book.name == name) {
@@ -67,13 +70,16 @@ module publicrypto::contract {
     }
 
     public entry fun publish_book(account: &signer, name: String, price: u64, ipfs_cid: String, encryption_pub_key: String) acquires Bookshelf {
+        let addr = signer::address_of(account);
+        if (is_some(&find_book_int(addr, name))) {
+            return
+        };
         let book = Book {
             name,
             price,
             ipfs_cid,
             encryption_pub_key,
         };
-        let addr = signer::address_of(account);
         if (exists<Bookshelf>(addr)) {
             let bookshelf = borrow_global_mut<Bookshelf>(addr);
             vector::push_back(&mut bookshelf.books, book);

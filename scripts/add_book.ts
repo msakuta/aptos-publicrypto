@@ -7,7 +7,7 @@ const APTOS_NETWORK: Network = NetworkToNetworkName[process.env.APTOS_NETWORK ||
 const PRIVATE_KEY: string = process.env.APTOS_PRIVATE_KEY || (() => {
     console.log("Please specify APTOS_PRIVATE_KEY env var to specify the account private key.");
     process.exit(1);
-});
+})();
 const config = new AptosConfig({ network: APTOS_NETWORK });
 const aptos = new Aptos(config);
 
