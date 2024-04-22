@@ -19,7 +19,7 @@ module publicrypto::contract {
         addr: address,
         encryption_pub_key: String,
         reencrypted_cid: Option<String>,
-        encrypted_passwd: Option<String>,
+        encrypted_passwd: Option<vector<u8>>,
     }
 
     struct Book has store {
@@ -68,7 +68,7 @@ module publicrypto::contract {
     }
 
     #[view]
-    public fun get_book_encrypted_password(name: String): Option<String> acquires Bookshelf {
+    public fun get_book_encrypted_password(name: String): Option<vector<u8>> acquires Bookshelf {
         let i = find_book_int(MODULE_OWNER, name);
         if (is_none(&i)) {
             return none()
@@ -136,7 +136,7 @@ module publicrypto::contract {
         }
     }
 
-    public entry fun reencrypt_book(account: &signer, name: String, encrypted_cid: String, encrypted_passwd: String) acquires Bookshelf {
+    public entry fun reencrypt_book(account: &signer, name: String, encrypted_cid: String, encrypted_passwd: vector<u8>) acquires Bookshelf {
         let addr = signer::address_of(account);
         let book_i = find_book_int(addr, name);
         assert!(option::is_some(&book_i), ENO_BOOK);
